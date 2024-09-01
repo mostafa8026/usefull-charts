@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ printf "%s--mariadb-pv" (include "wordpresslocal.fullname" .) }}
+  labels:
+    {{- range $key, $value := .Values.wordpress.mariadb.primary.persistence.selector.matchLabels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+spec:
+  storageClassName: {{.Values.wordpress.mariadb.primary.persistence.storageClass}}
+  accessModes:
+    {{- range .Values.wordpress.mariadb.primary.persistence.accessModes }}
+    - {{ . }}
+    {{- end }}
+  capacity:
+    storage: {{.Values.wordpress.mariadb.primary.persistence.size}}
+  local:
+    path: {{.Values.wordpress.mariadb.primary.persistence.path}}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+              {{- with .Values.wordpress.mariadb.primary.persistence.hostNames}}
+                {{- range . }}
+                - {{ . }}
+                {{- end }}
+              {{- end }}

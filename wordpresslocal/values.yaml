@@ -112,8 +112,16 @@ wordpress:
     selector:
       matchLabels:
         app: wordpress
-    path: /
+    path: /mnt/extra/wordpress/wpdata
     hostNames:
-      - node1
-      - node2
-      - node3
+      - node-de
+  mariadb:
+    primary:
+      persistence:
+        storageClass: local-storage
+        selector:
+          matchLabels:
+            app: mariadb
+        path: /mnt/extra/wordpress/mariadb
+        hostNames:
+          - node-de
